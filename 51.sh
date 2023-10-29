@@ -1,0 +1,46 @@
+#!/bin/bash
+
+[ $# -eq 1 ] || exit 1
+
+[ -d $1 ] || exit 2
+
+DIR=$1
+RES_FILE=$( mktemp )
+ERR_FILE=$( mktemp )
+
+for file in $(find $DIR/cfg -name '*.cfg' -type f -printf "-p\n"); do
+	
+	$DIR/validate.sh $file 2>/dev/null
+	if [ $? -eq 1 ]; then
+		$DIR/validate.sh file 2>&1 1>/dev/null | \
+			awk -v f=$file '{print f:$0}' >> $ERR_FILE
+		continue
+	fi
+
+	$DIR/validate.sh $file 2>/dev/null
+	if [ $? -eq 2 ]; then
+		continue
+	fi
+	
+	cat file >> RES_FILE
+
+	NAME=$(	echo file | \
+			awk -F '/' '{print $NF}' | \
+			awk -F '.cfg' '{print $1}')
+	
+	CHECK=$( egrep -c $NAME foo.pwd )
+	if [ $CHECK -eq 0 ]; then
+		PASS=$( pwgen 8 1 )
+		echo "$NAME:$PASS"
+		HASHED=$( mkpasswd $PASS )
+		echo "$NAME:$HASHED" >> foo.pwd
+	fi
+done
+
+cat $RES_FILE > $DIR/foo.conf
+
+echo "\nErrors:\n"
+cat $ERR_FILE
+
+rm -- $RES_FILE
+rm -- $ERR_FILE

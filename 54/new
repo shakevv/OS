@@ -1,0 +1,50 @@
+
+void bubble(uint8_t* arr, size_t size){
+		for(size_t i = 0; i < size - 1; ++ i){
+			for(size_t j = 0; j < size - i - 1; ++j){
+				if(arr[j] > arr[j+1]){
+					uint8_t tmp = arr[j];
+					arr[j] = arr[j+1];
+					arr[j+1] = tmp;
+				}
+			}
+		}
+}
+
+int main(int argc, char* argv[]){
+	if(argc != 2){
+		errx(1, "err");
+	}
+	fd = open(argv[1], O_RDWR);
+	if(fd == -1){
+		err(2, "%s", argv[1]);
+	}
+	struct stat st;
+	if(fstat(fd, &st) == -1){
+		err(3, "err");
+	}
+	uint8_t* arr = malloc(st.st_size);
+	if(arr == NULL){
+		errx(7, "not enough momory");
+	}
+	size_t i = 0;
+	ssize_t readsize;
+	readsize = read(fd, arr, st.st_size)
+	if(readsize == -1){
+		err(9, "err");
+	}
+	if(readsize != st.st_size){
+		errx(10, "err");
+	}
+	bubble(arr, st-st_size);
+	if(lseek(fd, 0, SEEK_SET) == -1){
+		err(11, "err");
+	}
+	if(write(fd, arr, st.st_size) == -1){
+		err(15, "err");
+	}
+	close(fd);
+	free(arr);
+
+	exit(0);
+}

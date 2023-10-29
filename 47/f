@@ -1,0 +1,4 @@
+Device S-state Status Sysfs node
+LID S4 *enabled platform:PNP0C0D:00
+XHC S3 *enabled pci:0000:00:14.0
+XDCI S4 *disabled
